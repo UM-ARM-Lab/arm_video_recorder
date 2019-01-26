@@ -1,0 +1,5 @@
+string filename
+bool record
+float32 timeout_in_sec
+---
+bool success

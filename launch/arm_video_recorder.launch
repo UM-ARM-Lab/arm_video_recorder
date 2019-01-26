@@ -1,5 +1,7 @@
 <launch>
+  <arg name="directory" default="$(find arm_video_recorder)/Captures/"/>
+  
   <node pkg="arm_video_recorder" type="video_recording.py" name="video_recorder"
-        output="screen" args="$(find arm_video_recorder)/Captures/"/>
+        output="screen" args="$(arg directory)"/>
   
 </launch>

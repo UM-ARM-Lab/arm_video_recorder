@@ -33,6 +33,7 @@ frame_dims = None
         
 def video_service_callback(req):
     global out
+    global recording
     
     recording = req.record
     resp = TriggerVideoRecordingResponse()
@@ -41,7 +42,7 @@ def video_service_callback(req):
         return resp
     
     out = cv2.VideoWriter(req.filename,
-                          cv2.VideoWriter_fourcc(*'H264'),
+                          0x00000021,
                           30,
                           frame_dims)
     resp.success = True
@@ -63,28 +64,30 @@ if __name__== "__main__":
     frame_dims = (int(cap.get(3)), int(cap.get(4)))
 
 
-    out = cv2.VideoWriter('output.mp4',
-                          cv2.VideoWriter_fourcc('M','P','E','G'),
-                          30,
-                          frame_dims)
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
-        # out.write(frame)
-
-        
-    # while not rospy.is_shutdown():
-    #     if not recording:
-    #         rospy.sleep(0.1)
-    #         continue
-        
+    # out = cv2.VideoWriter('output.mp4',
+    #                       0x00000021,
+    #                       # cv2.VideoWriter_fourcc('M','J','P','G'),
+    #                       30,
+    #                       frame_dims)
+    # while True:
     #     ret, frame = cap.read()
     #     if not ret:
-    #         rospy.logerr("Camera capture failed")
     #         break
+    #     out.write(frame)
+
         
-    #     out.write(file)
+    while not rospy.is_shutdown():
+        if not recording:
+            rospy.sleep(0.1)
+            continue
+        
+        ret, frame = cap.read()
+        if not ret:
+            rospy.logerr("Camera capture failed")
+            break
+        
+        out.write(frame)
+        cv2.imshow('Frame', frame)
         
 
     cap.release()

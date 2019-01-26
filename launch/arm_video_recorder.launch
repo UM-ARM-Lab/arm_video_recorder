@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="arm_video_recorder" type="video_recording.py" name="video_recorder"
+        output="screen" args="$(find arm_video_recorder)/Captures/"/>
+  
+</launch>

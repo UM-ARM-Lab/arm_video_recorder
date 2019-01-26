@@ -5,10 +5,11 @@ from std_msgs.msg import String
 from arm_video_recorder.srv import TriggerVideoRecording, TriggerVideoRecordingResponse
 from threading import Lock
 import time
+import sys
 
 
 class VideoRecorder:
-    def __init__(self, cap):
+    def __init__(self, cap, path_prefix):
         self.out_filename = None
         self.lock = Lock()
         self.is_recording = False
@@ -18,6 +19,7 @@ class VideoRecorder:
         self.cap = cap
         self.record_start_time = time.time()
         self.record_time_limit = 0
+        self.path_prefix = path_prefix
 
     def stop_current_recording(self):
         if self.out is not None:
@@ -42,13 +44,13 @@ class VideoRecorder:
         
         frame_dims = (int(self.cap.get(3)), int(self.cap.get(4)))
 
-        self.out = cv2.VideoWriter(filename,
+        self.out = cv2.VideoWriter(self.path_prefix + filename,
                                    fourcc_code,
                                    30,
                                    frame_dims)
         return True
 
-    def srv_trigger_recording_callback(self, req):
+    def srv_trigger_recording_callback(self, req):    
         resp = TriggerVideoRecordingResponse()
         resp.success = True
         with self.lock:
@@ -114,8 +116,15 @@ if __name__== "__main__":
 
         
     rospy.loginfo("Video Recorder ready")
+    prefix = ""
+    if len(sys.argv) < 4:
+        rospy.loginfo("No absolution path provided. Saving files to relative path")
+    else:
+        prefix = sys.argv[1]
+        rospy.loginfo("Recording to " + prefix)
 
-    vr = VideoRecorder(cap)
+
+    vr = VideoRecorder(cap, prefix)
 
     while not rospy.is_shutdown():
         vr.work_in_loop()

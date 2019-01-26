@@ -33,12 +33,15 @@ def video_service_callback(req):
 
 if __name__== "__main__":
     rospy.init_node("video_recorder")
-    s = rospy.Service('video_recorder', TriggerVideoRecording, video_service_callback)
 
-    cap = cv2.VideoCapture("sample_video.mp4")
+    cap = cv2.VideoCapture(0)  #0 captures from webcam
+    # cap = cv2.VideoCapture("sample_video.mp4")
 
     if(not cap.isOpened()):
-        print("Error opening video stream or file")
+        rospy.logerr("Error opening video stream or file")
+        exit()
+
+    s = rospy.Service('video_recorder', TriggerVideoRecording, video_service_callback)
 
     frame_dims = (int(cap.get(3)), int(cap.get(4)))
 
@@ -49,7 +52,6 @@ if __name__== "__main__":
     while not rospy.is_shutdown():
         with lock:
             if stop_current_recording:
-
                 stop_current_recording = False
                 if recording:
                     rospy.loginfo("Stopping current recording")

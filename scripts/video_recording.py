@@ -27,14 +27,26 @@ class VideoRecorder:
         self.is_recording = False
 
     def start_new_recording(self, filename):
+        fourcc_code = None
+        if filename[-4:] == ".mp4":
+            fourcc_code = 0x00000021
+        elif filename[-4:] == ".avi":
+            fourcc_code = int(cap.get(cv2.CAP_PROP_FOURCC))
+        else:
+            rospy.logerr("Invalid file type " + filename[-4:])
+            return False
+            
         self.is_recording = True
         self.record_start_time = time.time()
         rospy.loginfo("Starting recording for " + filename)
+        
         frame_dims = (int(self.cap.get(3)), int(self.cap.get(4)))
+
         self.out = cv2.VideoWriter(filename,
-                                   0x00000021,
+                                   fourcc_code,
                                    30,
                                    frame_dims)
+        return True
 
     def srv_trigger_recording_callback(self, req):
         resp = TriggerVideoRecordingResponse()
@@ -43,7 +55,8 @@ class VideoRecorder:
             self.stop_current_recording()
             self.record_time_limit = req.timeout_in_sec
             if(req.record):
-                self.start_new_recording(req.filename)
+                if not self.start_new_recording(req.filename):
+                    resp.success = False
             
         if(self.record_time_limit <= 0):
             resp.success = False
@@ -74,7 +87,17 @@ class VideoRecorder:
                 return
 
 
-            
+
+def live_view(cap):
+    print "Frame dims: ", cap.get(3), ", ", cap.get(4)
+    print "FourCC code: ", cap.get(cv2.CAP_PROP_FOURCC)
+    while(True):
+        ret, frame = cap.read()
+        cv2.imshow('frame',frame)
+ 
+        # Press Q on keyboard to stop recording
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            exit()
 
 
 if __name__== "__main__":
@@ -82,6 +105,8 @@ if __name__== "__main__":
 
     cap = cv2.VideoCapture(0)  #0 captures from webcam
     # cap = cv2.VideoCapture("sample_video.mp4")
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 5000)  #Sets the camera to the maximal resolution
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 5000)  # up to 5000 x 5000
 
     if(not cap.isOpened()):
         rospy.logerr("Error opening video stream or file")

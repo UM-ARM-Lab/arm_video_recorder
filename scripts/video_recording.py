@@ -3,23 +3,26 @@ import cv2
 import rospy
 from std_msgs.msg import String
 from arm_video_recorder.srv import TriggerVideoRecording, TriggerVideoRecordingResponse
-
+from threading import Lock
 
 record_srv_cmd = False
 start_new_recording = False
 stop_current_recording = False
 out_filename = None
 
+lock = Lock()
         
 def video_service_callback(req):
     global start_new_recording
     global stop_current_recording
     global out_filename
+    global lock
 
-    out_filename = req.filename
-    
-    start_new_recording = req.record
-    stop_current_recording = True
+    with lock:
+        out_filename = req.filename
+        
+        start_new_recording = req.record
+        stop_current_recording = True
     
     resp = TriggerVideoRecordingResponse()
 
@@ -44,21 +47,24 @@ if __name__== "__main__":
     recording = False
     out = None
     while not rospy.is_shutdown():
-        if stop_current_recording:
-            recording = False
-            stop_current_recording = False
-            rospy.loginfo("Stopping any existing recordings")
-            if out is not None:
-                out.release()
+        with lock:
+            if stop_current_recording:
+
+                stop_current_recording = False
+                if recording:
+                    rospy.loginfo("Stopping current recording")
+                recording = False
+                if out is not None:
+                    out.release()
             
-        if start_new_recording:
-            recording = True
-            start_new_recording = False
-            rospy.loginfo("Starting recording for " + out_filename)
-            out = cv2.VideoWriter(out_filename,
-                                  0x00000021,
-                                  30,
-                                  frame_dims)
+            if start_new_recording:
+                recording = True
+                start_new_recording = False
+                rospy.loginfo("Starting recording for " + out_filename)
+                out = cv2.VideoWriter(out_filename,
+                                      0x00000021,
+                                      30,
+                                      frame_dims)
 
         if not recording:
             rospy.sleep(0.1)

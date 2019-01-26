@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(arc_video_recorder)
+project(arm_video_recorder)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -102,7 +102,7 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES arc_video_recorder
+#  LIBRARIES arm_video_recorder
  CATKIN_DEPENDS rospy message_runtime std_msgs
 #  DEPENDS system_lib
 )
@@ -120,7 +120,7 @@ ${catkin_INCLUDE_DIRS}
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/arc_video_recorder.cpp
+#   src/${PROJECT_NAME}/arm_video_recorder.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -131,7 +131,7 @@ ${catkin_INCLUDE_DIRS}
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/arc_video_recorder_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/arm_video_recorder_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -188,7 +188,7 @@ ${catkin_INCLUDE_DIRS}
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_arc_video_recorder.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_arm_video_recorder.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

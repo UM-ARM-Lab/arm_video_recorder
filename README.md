@@ -19,3 +19,6 @@ Any camera that can interface with opencv's VideoCapture can be recorded. For lo
 
 For high quality video, connect the lab camera to the capture card via HDMI. Connect the capture card to the computer via USB. 
 If necessary, change settings on the Camera to prevent showing status icons (e.g. battery level) on the HDMI output.
+
+![Capture Card:](https://github.com/UM-ARM-Lab/arm_video_recorder/blob/master/CaptureCard.JPG)
+![MiniHDMIConnection:](https://github.com/UM-ARM-Lab/arm_video_recorder/blob/master/MiniHDMI.JPG)

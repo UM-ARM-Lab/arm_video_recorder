@@ -88,6 +88,9 @@ class VideoRecorder:
                 self.save_frame()
                 return
 
+    def on_close(self):
+        with self.lock:
+            self.stop_current_recording()
 
 
 def live_view(cap):
@@ -131,6 +134,7 @@ if __name__== "__main__":
         rospy.sleep(0.01) # Don't eat up 100%CPU in the while loop
 
 
+    vr.on_close()
     cap.release()
 
 

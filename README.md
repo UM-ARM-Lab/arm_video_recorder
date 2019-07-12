@@ -11,7 +11,7 @@ ROS node to record from a connected video device (webcam) and save to a file
 
 ## Service Arguments
 - `bool record`: If `Stop` request recording stop. If `True` request recording start (stops previous recording). 
-- `string filename`: Filepath to save recorded video. Can be absolute or relative. Must end with `.avi` or `.mp4`
+- `string filename`: Filepath to save recorded video. Can be absolute or relative. Must end with `.mp4` (recommended) or `.avi`.
 - `float timeout_in_sec`: Maximum time to record. Must be set `> 0`. Limit to 1hr to avoid large video recordings if you forget to stop recordings
 
 ## High Quality Video

@@ -10,9 +10,9 @@ ROS node to record from a connected video device (webcam) and save to a file
 
 
 ## Service Arguments
-- `bool record`: If `Stop` request recording stop. If `True` request recording start (stops previous recording). 
+- `bool record`: If `False` request recording stop. If `True` request recording start (stops previous recording). 
 - `string filename`: Filepath to save recorded video. Can be absolute or relative. Must end with `.mp4` (recommended) or `.avi`.
-- `float timeout_in_sec`: Maximum time to record. Must be set `> 0`. Limit to 1hr to avoid large video recordings if you forget to stop recordings
+- `float timeout_in_sec`: Maximum time to record. Must be set `> 0`. Recommend setting to 1hr to avoid large video recordings if you forget to stop recordings
 
 ## High Quality Video
 Any camera that can interface with opencv's VideoCapture can be recorded. For low quality video plug a webcam into the computer running this ros node.

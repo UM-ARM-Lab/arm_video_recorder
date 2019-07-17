@@ -6,6 +6,7 @@ from arm_video_recorder.srv import TriggerVideoRecording, TriggerVideoRecordingR
 from threading import Lock
 import time
 import sys
+import os
 
 
 class VideoRecorder:
@@ -38,13 +39,22 @@ class VideoRecorder:
             rospy.logerr("Invalid file type " + filename[-4:])
             return False
             
-        self.is_recording = True
-        self.record_start_time = time.time()
-        rospy.loginfo("Starting recording for " + filename)
         
         frame_dims = (int(self.cap.get(3)), int(self.cap.get(4)))
 
-        self.out = cv2.VideoWriter(self.path_prefix + filename,
+        if(not filename.startswith('/')):
+            filename = self.path_prefix + filename
+
+        rospy.loginfo("Starting recording for " + filename)
+        if(not os.path.exists(os.path.dirname(filename))):
+            rospy.logerr("Path does not exist: " + os.path.dirname(filename))
+            rospy.logerr("Create new directory or change saved filepath")
+            return False
+
+        self.is_recording = True
+        self.record_start_time = time.time()
+
+        self.out = cv2.VideoWriter(filename,
                                    fourcc_code,
                                    30,
                                    frame_dims)

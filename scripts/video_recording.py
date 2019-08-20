@@ -40,8 +40,8 @@ class VideoRecorder:
         else:
             rospy.logerr("Invalid file type " + filename[-4:])
             return False
-            
-        
+
+
         frame_dims = (int(self.cap.get(3)), int(self.cap.get(4)))
 
         if(not filename.startswith('/')):
@@ -52,17 +52,17 @@ class VideoRecorder:
             rospy.logerr("Path does not exist: " + os.path.dirname(filename))
             rospy.logerr("Create new directory or change saved filepath")
             return False
-            
+
         self.is_recording = True
         self.record_start_time = time.time()
-        
+
         self.out = cv2.VideoWriter(filename,
                                    fourcc_code,
                                    30,
                                    frame_dims)
         return True
 
-    def srv_trigger_recording_callback(self, req):    
+    def srv_trigger_recording_callback(self, req):
         resp = TriggerVideoRecordingResponse()
         resp.success = True
         with self.lock:
@@ -71,7 +71,7 @@ class VideoRecorder:
             if(req.record):
                 if not self.start_new_recording(req.filename):
                     resp.success = False
-            
+
         if(self.record_time_limit <= 0):
             resp.success = False
             rospy.logerr("Cannot record with a timeout of 0s")
@@ -92,7 +92,7 @@ class VideoRecorder:
             self.stop_current_recording()
             return False
         return True
-        
+
 
     def work_in_loop(self):
         with self.lock:
@@ -111,7 +111,7 @@ def live_view(cap):
     while(True):
         ret, frame = cap.read()
         cv2.imshow('frame',frame)
- 
+
         # Press Q on keyboard to stop recording
         if cv2.waitKey(1) & 0xFF == ord('q'):
             exit()
@@ -137,7 +137,7 @@ if __name__== "__main__":
         rospy.logerr("Error opening video stream or file")
         exit()
 
-        
+
     rospy.loginfo("Video Recorder ready")
     prefix = ""
     if len(sys.argv) < 4:

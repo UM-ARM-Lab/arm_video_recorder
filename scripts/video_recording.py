@@ -6,7 +6,10 @@ from arm_video_recorder.srv import TriggerVideoRecording, TriggerVideoRecordingR
 from threading import Lock
 import time
 import sys
+import os
+import re
 
+DEFAULT_CAMERA_NAME = '/dev/v4l/by-id/usb-AVerMedia_Technologies__Inc._Live_Gamer_Portable_2_Plus_5500114600612-video-index0'
 
 class VideoRecorder:
     def __init__(self, cap, path_prefix):
@@ -108,7 +111,15 @@ def live_view(cap):
 if __name__== "__main__":
     rospy.init_node("video_recorder")
 
-    cap = cv2.VideoCapture(0)  #0 captures from webcam
+    device_num = 0  #0 captures from webcam (specifically /dev/video0)
+    if os.path.exists(DEFAULT_CAMERA_NAME):
+        device_path = os.path.realpath(DEFAULT_CAMERA_NAME)
+        device_re = re.compile("\/dev\/video(\d+)")
+        info = device_re.match(device_path)
+        if info.groups():
+            device_num = int(info.group(1))
+            print("Device: ", device_num)
+    cap = cv2.VideoCapture(device_num)
     # cap = cv2.VideoCapture("sample_video.mp4")
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 5000)  #Sets the camera to the maximal resolution
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 5000)  # up to 5000 x 5000

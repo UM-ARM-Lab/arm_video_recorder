@@ -125,9 +125,9 @@ if __name__== "__main__":
         device_path = os.path.realpath(DEFAULT_CAMERA_NAME)
         device_re = re.compile("\/dev\/video(\d+)")
         info = device_re.match(device_path)
-        if info.groups():
+        if info:
             device_num = int(info.group(1))
-            print("Device: ", device_num)
+            rospy.loginfo("Using default video capture device on /dev/video" + str(device_num))
     cap = cv2.VideoCapture(device_num)
     # cap = cv2.VideoCapture("sample_video.mp4")
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 5000)  #Sets the camera to the maximal resolution

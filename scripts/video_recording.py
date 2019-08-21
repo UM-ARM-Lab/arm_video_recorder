@@ -7,7 +7,9 @@ from threading import Lock
 import time
 import sys
 import os
+import re
 
+DEFAULT_CAMERA_NAME = '/dev/v4l/by-id/usb-AVerMedia_Technologies__Inc._Live_Gamer_Portable_2_Plus_5500114600612-video-index0'
 
 class VideoRecorder:
     def __init__(self, cap, path_prefix):
@@ -38,8 +40,8 @@ class VideoRecorder:
         else:
             rospy.logerr("Invalid file type " + filename[-4:])
             return False
-            
-        
+
+
         frame_dims = (int(self.cap.get(3)), int(self.cap.get(4)))
 
         if(not filename.startswith('/')):
@@ -60,7 +62,7 @@ class VideoRecorder:
                                    frame_dims)
         return True
 
-    def srv_trigger_recording_callback(self, req):    
+    def srv_trigger_recording_callback(self, req):
         resp = TriggerVideoRecordingResponse()
         resp.success = True
         with self.lock:
@@ -69,7 +71,7 @@ class VideoRecorder:
             if(req.record):
                 if not self.start_new_recording(req.filename):
                     resp.success = False
-            
+
         if(self.record_time_limit <= 0):
             resp.success = False
             rospy.logerr("Cannot record with a timeout of 0s")
@@ -90,7 +92,7 @@ class VideoRecorder:
             self.stop_current_recording()
             return False
         return True
-        
+
 
     def work_in_loop(self):
         with self.lock:
@@ -109,7 +111,7 @@ def live_view(cap):
     while(True):
         ret, frame = cap.read()
         cv2.imshow('frame',frame)
- 
+
         # Press Q on keyboard to stop recording
         if cv2.waitKey(1) & 0xFF == ord('q'):
             exit()
@@ -118,7 +120,15 @@ def live_view(cap):
 if __name__== "__main__":
     rospy.init_node("video_recorder")
 
-    cap = cv2.VideoCapture(0)  #0 captures from webcam
+    device_num = 0  #0 captures from webcam (specifically /dev/video0)
+    if os.path.exists(DEFAULT_CAMERA_NAME):
+        device_path = os.path.realpath(DEFAULT_CAMERA_NAME)
+        device_re = re.compile("\/dev\/video(\d+)")
+        info = device_re.match(device_path)
+        if info:
+            device_num = int(info.group(1))
+            rospy.loginfo("Using default video capture device on /dev/video" + str(device_num))
+    cap = cv2.VideoCapture(device_num)
     # cap = cv2.VideoCapture("sample_video.mp4")
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 5000)  #Sets the camera to the maximal resolution
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 5000)  # up to 5000 x 5000
@@ -127,7 +137,7 @@ if __name__== "__main__":
         rospy.logerr("Error opening video stream or file")
         exit()
 
-        
+
     rospy.loginfo("Video Recorder ready")
     prefix = ""
     if len(sys.argv) < 4:

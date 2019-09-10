@@ -70,7 +70,7 @@ class VideoRecorder:
                 if not self.start_new_recording(req.filename):
                     resp.success = False
             
-        if(self.record_time_limit <= 0):
+        if(req.record and self.record_time_limit <= 0):
             resp.success = False
             rospy.logerr("Cannot record with a timeout of 0s")
 

@@ -1,5 +1,5 @@
-# arm_video_recorder
-ROS node to record from a connected video device (webcam) and save to a file
+# Arm Video Recorder
+This connects a webcam or camcorder to ROS for automaticly triggered video recording
 
 ## Basic Usage
 

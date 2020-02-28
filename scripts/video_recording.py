@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+from __future__ import print_function
 import cv2
 import rospy
 from std_msgs.msg import String
@@ -72,7 +73,7 @@ class VideoRecorder:
                 if not self.start_new_recording(req.filename):
                     resp.success = False
 
-        if(self.record_time_limit <= 0):
+        if req.record and self.record_time_limit <= 0:
             resp.success = False
             rospy.logerr("Cannot record with a timeout of 0s")
 
@@ -106,8 +107,8 @@ class VideoRecorder:
 
 
 def live_view(cap):
-    print "Frame dims: ", cap.get(3), ", ", cap.get(4)
-    print "FourCC code: ", cap.get(cv2.CAP_PROP_FOURCC)
+    print("Frame dims: ", cap.get(3), ", ", cap.get(4))
+    print("FourCC code: ", cap.get(cv2.CAP_PROP_FOURCC))
     while(True):
         ret, frame = cap.read()
         cv2.imshow('frame',frame)
@@ -156,6 +157,4 @@ if __name__== "__main__":
 
     vr.on_close()
     cap.release()
-
-
 

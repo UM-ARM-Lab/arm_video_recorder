@@ -22,3 +22,7 @@ If necessary, change settings on the Camera to prevent showing status icons (e.g
 
 ![Capture Card:](https://github.com/UM-ARM-Lab/arm_video_recorder/blob/master/CaptureCard.JPG)
 ![MiniHDMIConnection:](https://github.com/UM-ARM-Lab/arm_video_recorder/blob/master/MiniHDMI.JPG)
+
+
+## Troubleshooting
+If you see a black video, likely the connection from the HDMI cable is loose. The miniHDMI connection to the armlab camera is finicky, and may need to be taped in place

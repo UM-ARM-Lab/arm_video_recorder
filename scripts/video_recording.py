@@ -35,7 +35,7 @@ class VideoRecorder:
     def start_new_recording(self, filename):
         fourcc_code = None
         if filename[-4:] == ".mp4":
-            fourcc_code = 0x00000021
+            fourcc_code = cv2.VideoWriter_fourcc(*"mp4v") #Previously used hardcoded fourcc_code = 0x00000021
         elif filename[-4:] == ".avi":
             fourcc_code = int(cap.get(cv2.CAP_PROP_FOURCC))
         else:

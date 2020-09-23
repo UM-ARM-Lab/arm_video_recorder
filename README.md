@@ -6,7 +6,8 @@ This connects a webcam or camcorder to ROS for automaticly triggered video recor
 1. Clone repo, rebuild (`catkin_make`), re-source (`source ~/catkin_ws/devel/setup.bash`)
 2. Plug in camera to USB port
 2. `roslaunch arm_video_recorder arm_video_recorder.launch`
-3. Call the service to start recording video. Call the service again to stop recording
+3. Call the service to start recording video. Call the service again to stop recording such as
+  `rosservice call /video_recorder ~/video.mp4 1 100`
 
 
 ## Service Arguments

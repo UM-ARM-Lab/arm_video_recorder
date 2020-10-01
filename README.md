@@ -8,6 +8,27 @@ This connects a webcam or camcorder to ROS for automaticly triggered video recor
 2. `roslaunch arm_video_recorder arm_video_recorder.launch`
 3. Call the service to start recording video. Call the service again to stop recording such as
   `rosservice call /video_recorder ~/video.mp4 1 100`
+  
+## Python Example Code
+```
+from arm_video_recorder.srv import TriggerVideoRecording, TriggerVideoRecordingRequest
+...
+
+
+    video = rospy.ServiceProxy("/video_recorder", TriggerVideoRecording)
+    req = TriggerVideoRecordingRequest()
+
+    req.filename = "my_experiment_name_{}.mp4".format(unique_trial_string)
+    req.timeout_in_sec = 60.0
+    req.record = True
+    video(req)
+    
+    [make the robot do something]
+    
+    req.record=False
+    video(req)
+```
+
 
 
 ## Service Arguments

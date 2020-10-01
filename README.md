@@ -17,7 +17,6 @@ from arm_video_recorder.srv import TriggerVideoRecording, TriggerVideoRecordingR
 
     video = rospy.ServiceProxy("/video_recorder", TriggerVideoRecording)
     req = TriggerVideoRecordingRequest()
-
     req.filename = "my_experiment_name_{}.mp4".format(unique_trial_string)
     req.timeout_in_sec = 60.0
     req.record = True

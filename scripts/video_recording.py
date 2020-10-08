@@ -59,7 +59,7 @@ class VideoRecorder:
 
         self.out = cv2.VideoWriter(filename,
                                    fourcc_code,
-                                   30,
+                                   24,
                                    frame_dims)
         return True
 

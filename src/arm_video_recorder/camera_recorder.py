@@ -6,7 +6,7 @@ from pathlib import Path
 
 class CameraRecorder:
 
-    def __init__(self, filename=None, timestamp_format='%Y_%m_%d_%H_%M_%S', timeout_seconds=600.0):
+    def __init__(self, filename, timestamp_format='%Y_%m_%d_%H_%M_%S', timeout_seconds=600.0):
         self.save_file = filename
         self.timestamp_format = timestamp_format
         self.video_srv = rospy.ServiceProxy("/video_recorder", TriggerVideoRecording)
@@ -21,6 +21,7 @@ class CameraRecorder:
         req.timeout_in_sec = self.timeout
         req.record = True
         resp = self.video_srv(req)
+        rospy.loginfo(f"Starting recording video to {req.filename}")
         if not resp.success:
             raise RuntimeError("Unable to start live camera recording")
 

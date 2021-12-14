@@ -1,14 +1,18 @@
 #! /usr/bin/env python
 from __future__ import print_function
-import cv2
-import rospy
-from std_msgs.msg import String
-from arm_video_recorder.srv import TriggerVideoRecording, TriggerVideoRecordingResponse
-from threading import Lock
-import time
-import sys
+
+import argparse
 import os
+import pathlib
 import re
+import sys
+import time
+from threading import Lock
+
+import cv2
+from arm_video_recorder.srv import TriggerVideoRecording, TriggerVideoRecordingResponse
+
+import rospy
 
 DEFAULT_CAMERA_NAME = '/dev/v4l/by-id/usb-AVerMedia_Technologies__Inc._Live_Gamer_Portable_2_Plus_5500114600612-video-index0'
 
@@ -34,7 +38,6 @@ class VideoRecorder:
         self.is_recording = False
 
     def start_new_recording(self, filename):
-        fourcc_code = None
         if filename[-4:] == ".mp4":
             fourcc_code = cv2.VideoWriter_fourcc(*"mp4v")  # Previously used hardcoded fourcc_code = 0x00000021
         elif filename[-4:] == ".avi":
@@ -44,12 +47,17 @@ class VideoRecorder:
             return False
 
         frame_dims = (int(self.cap.get(3)), int(self.cap.get(4)))
+        fps = 24
+        print(frame_dims)
 
-        if (not filename.startswith('/')):
+        if not filename.startswith('/'):
             filename = self.path_prefix + filename
+        elif filename.startswith("/media"):
+            parent_dir = pathlib.Path(filename).parent
+            parent_dir.mkdir(exist_ok=True, parents=True)
 
         rospy.loginfo("Starting recording for " + filename)
-        if (not os.path.exists(os.path.dirname(filename))):
+        if not os.path.exists(os.path.dirname(filename)):
             rospy.logerr("Path does not exist: " + os.path.dirname(filename))
             rospy.logerr("Create new directory or change saved filepath")
             return False
@@ -59,7 +67,7 @@ class VideoRecorder:
 
         self.out = cv2.VideoWriter(filename,
                                    fourcc_code,
-                                   24,
+                                   fps,
                                    frame_dims)
         return True
 
@@ -108,7 +116,7 @@ class VideoRecorder:
 def live_view(cap):
     print("Frame dims: ", cap.get(3), ", ", cap.get(4))
     print("FourCC code: ", cap.get(cv2.CAP_PROP_FOURCC))
-    while (True):
+    while True:
         ret, frame = cap.read()
         cv2.imshow('frame', frame)
 
@@ -120,9 +128,15 @@ def live_view(cap):
 if __name__ == "__main__":
     rospy.init_node("video_recorder")
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument('directory')
+    parser.add_argument('--camera-name', default=DEFAULT_CAMERA_NAME, help='A path like /dev/v4l/by-id/...')
+
+    args = parser.parse_args(rospy.myargv(sys.argv[1:]))
+
     device_num = 0  # 0 captures from webcam (specifically /dev/video0)
-    if os.path.exists(DEFAULT_CAMERA_NAME):
-        device_path = os.path.realpath(DEFAULT_CAMERA_NAME)
+    if os.path.exists(args.camera_name):
+        device_path = os.path.realpath(args.camera_name)
         device_re = re.compile("\/dev\/video(\d+)")
         info = device_re.match(device_path)
         if info:
@@ -138,14 +152,8 @@ if __name__ == "__main__":
         exit()
 
     rospy.loginfo("Video Recorder ready")
-    prefix = ""
-    if len(sys.argv) < 4:
-        rospy.loginfo("No absolution path provided. Saving files to relative path")
-    else:
-        prefix = sys.argv[1]
-        rospy.loginfo("Recording to " + prefix)
 
-    vr = VideoRecorder(cap, prefix)
+    vr = VideoRecorder(cap, args.directory)
 
     while not rospy.is_shutdown():
         vr.work_in_loop()

@@ -12,6 +12,7 @@ import re
 
 DEFAULT_CAMERA_NAME = '/dev/v4l/by-id/usb-AVerMedia_Technologies__Inc._Live_Gamer_Portable_2_Plus_5500114600612-video-index0'
 
+
 class VideoRecorder:
     def __init__(self, cap, path_prefix):
         self.out_filename = None
@@ -35,21 +36,20 @@ class VideoRecorder:
     def start_new_recording(self, filename):
         fourcc_code = None
         if filename[-4:] == ".mp4":
-            fourcc_code = cv2.VideoWriter_fourcc(*"mp4v") #Previously used hardcoded fourcc_code = 0x00000021
+            fourcc_code = cv2.VideoWriter_fourcc(*"mp4v")  # Previously used hardcoded fourcc_code = 0x00000021
         elif filename[-4:] == ".avi":
             fourcc_code = int(cap.get(cv2.CAP_PROP_FOURCC))
         else:
             rospy.logerr("Invalid file type " + filename[-4:])
             return False
 
-
         frame_dims = (int(self.cap.get(3)), int(self.cap.get(4)))
 
-        if(not filename.startswith('/')):
+        if (not filename.startswith('/')):
             filename = self.path_prefix + filename
 
         rospy.loginfo("Starting recording for " + filename)
-        if(not os.path.exists(os.path.dirname(filename))):
+        if (not os.path.exists(os.path.dirname(filename))):
             rospy.logerr("Path does not exist: " + os.path.dirname(filename))
             rospy.logerr("Create new directory or change saved filepath")
             return False
@@ -69,7 +69,7 @@ class VideoRecorder:
         with self.lock:
             self.stop_current_recording()
             self.record_time_limit = req.timeout_in_sec
-            if(req.record):
+            if (req.record):
                 if not self.start_new_recording(req.filename):
                     resp.success = False
 
@@ -94,7 +94,6 @@ class VideoRecorder:
             return False
         return True
 
-
     def work_in_loop(self):
         with self.lock:
             if self.is_recording and self.check_timeout():
@@ -109,19 +108,19 @@ class VideoRecorder:
 def live_view(cap):
     print("Frame dims: ", cap.get(3), ", ", cap.get(4))
     print("FourCC code: ", cap.get(cv2.CAP_PROP_FOURCC))
-    while(True):
+    while (True):
         ret, frame = cap.read()
-        cv2.imshow('frame',frame)
+        cv2.imshow('frame', frame)
 
         # Press Q on keyboard to stop recording
         if cv2.waitKey(1) & 0xFF == ord('q'):
             exit()
 
 
-if __name__== "__main__":
+if __name__ == "__main__":
     rospy.init_node("video_recorder")
 
-    device_num = 0  #0 captures from webcam (specifically /dev/video0)
+    device_num = 0  # 0 captures from webcam (specifically /dev/video0)
     if os.path.exists(DEFAULT_CAMERA_NAME):
         device_path = os.path.realpath(DEFAULT_CAMERA_NAME)
         device_re = re.compile("\/dev\/video(\d+)")
@@ -131,13 +130,12 @@ if __name__== "__main__":
             rospy.loginfo("Using default video capture device on /dev/video" + str(device_num))
     cap = cv2.VideoCapture(device_num)
     # cap = cv2.VideoCapture("sample_video.mp4")
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 5000)  #Sets the camera to the maximal resolution
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 5000)  # Sets the camera to the maximal resolution
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 5000)  # up to 5000 x 5000
 
-    if(not cap.isOpened()):
+    if (not cap.isOpened()):
         rospy.logerr("Error opening video stream or file")
         exit()
-
 
     rospy.loginfo("Video Recorder ready")
     prefix = ""
@@ -147,14 +145,11 @@ if __name__== "__main__":
         prefix = sys.argv[1]
         rospy.loginfo("Recording to " + prefix)
 
-
     vr = VideoRecorder(cap, prefix)
 
     while not rospy.is_shutdown():
         vr.work_in_loop()
-        rospy.sleep(0.01) # Don't eat up 100%CPU in the while loop
-
+        rospy.sleep(0.01)  # Don't eat up 100%CPU in the while loop
 
     vr.on_close()
     cap.release()
-

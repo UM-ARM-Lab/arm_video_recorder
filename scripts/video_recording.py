@@ -47,7 +47,6 @@ class VideoRecorder:
             return False
 
         frame_dims = (int(self.cap.get(3)), int(self.cap.get(4)))
-        fps = 24
         print(frame_dims)
 
         if not filename.startswith('/'):
@@ -67,7 +66,7 @@ class VideoRecorder:
 
         self.out = cv2.VideoWriter(filename,
                                    fourcc_code,
-                                   fps,
+                                   args.fps,
                                    frame_dims)
         return True
 
@@ -131,6 +130,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('directory')
     parser.add_argument('--camera-name', default=DEFAULT_CAMERA_NAME, help='A path like /dev/v4l/by-id/...')
+    parser.add_argument('--fps-name', default=24, type=int)
 
     args = parser.parse_args(rospy.myargv(sys.argv[1:]))
 

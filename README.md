@@ -1,5 +1,5 @@
 # Arm Video Recorder
-This connects a webcam or camcorder to ROS for automaticly triggered video recording
+This connects a webcam or camcorder to ROS for automatically triggered video recording
 
 ## Basic Usage
 
